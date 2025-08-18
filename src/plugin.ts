@@ -1,79 +1,82 @@
-import type { Config, Plugin } from 'payload/config'
+import type { Config } from 'payload'
 
-import { onInitExtension } from './onInitExtension'
-import type { PluginTypes } from './types'
-import { extendWebpackConfig } from './webpack'
-import AfterDashboard from './components/AfterDashboard'
-import newCollection from './newCollection'
+import type { MyPluginOptions } from './types'
 
-type PluginType = (pluginOptions: PluginTypes) => Plugin
+import { helloWorldHandler } from './endpoints'
 
-export const samplePlugin =
-  (pluginOptions: PluginTypes): Plugin =>
-    (incomingConfig) => {
-      let config = { ...incomingConfig }
+export const myPlugin =
+  (pluginOptions: MyPluginOptions) =>
+  (incomingConfig: Config): Config => {
+    const config = { ...incomingConfig }
 
-      // If you need to add a webpack alias, use this function to extend the webpack config
-      const webpack = extendWebpackConfig(incomingConfig)
+    config.admin = {
+      ...(config.admin || {}),
 
-      config.admin = {
-        ...(config.admin || {}),
-        // If you extended the webpack config, add it back in here
-        // If you did not extend the webpack config, you can remove this line
-        webpack,
+      // Add additional admin config here
 
-        // Add additional admin config here
+      components: {
+        ...(config.admin?.components || {}),
+        // Add additional admin components here
+        afterDashboard: [
+          'payload-plugin-template/components#AfterDashboard',
+          'payload-plugin-template/components#AfterDashboardClient',
+        ],
+      },
+    }
 
-        components: {
-          ...(config.admin?.components || {}),
-          // Add additional admin components here
-          afterDashboard: [
-            ...(config.admin?.components?.afterDashboard || []),
-            AfterDashboard,
-          ],
-        },
-      }
-
-      // If the plugin is disabled, return the config without modifying it
-      // The order of this check is important, we still want any webpack extensions to be applied even if the plugin is disabled
-      if (pluginOptions.enabled === false) {
-        return config
-      }
-
-      config.collections = [
-        ...(config.collections || []),
-        // Add additional collections here
-        newCollection, // delete this line to remove the example collection
-      ]
-
-      config.endpoints = [
-        ...(config.endpoints || []),
-        {
-          path: '/custom-endpoint',
-          method: 'get',
-          root: true,
-          handler: (req, res): void => {
-            res.json({ message: 'Here is a custom endpoint' });
-          },
-        },
-        // Add additional endpoints here
-      ]
-
-      config.globals = [
-        ...(config.globals || []),
-        // Add additional globals here
-      ]
-
-      config.hooks = {
-        ...(config.hooks || {}),
-        // Add additional hooks here
-      }
-
-      config.onInit = async payload => {
-        if (incomingConfig.onInit) await incomingConfig.onInit(payload)
-        // Add additional onInit code by using the onInitExtension function
-        onInitExtension(pluginOptions, payload)
-      }
-
+    /**
+     * If the plugin is disabled, return the config without modifying it
+     *
+     * Be cautious when using this if your plugin adds new collections or fields
+     * as this could cause issues w/ Postgres migrations
+     */
+    if (pluginOptions.enabled === false) {
       return config
     }
+
+    config.collections = (config.collections || []).map((collection) => {
+      const modifiedCollection = { ...collection }
+
+      // Make changes to the collection here
+
+      modifiedCollection.fields = (modifiedCollection.fields || []).map((field) => {
+        const newField = { ...field }
+
+        // Make changes to the fields here
+
+        return newField
+      })
+
+      return modifiedCollection
+    })
+
+    // Add additional collections here
+
+    config.endpoints = [
+      ...(config.endpoints || []),
+      {
+        handler: helloWorldHandler,
+        method: 'get',
+        path: '/hello-world',
+      },
+      // Add additional endpoints here
+    ]
+
+    config.globals = [
+      ...(config.globals || []),
+      // Add additional globals here
+    ]
+
+    config.hooks = {
+      ...(config.hooks || {}),
+      // Add additional hooks here
+    }
+
+    config.onInit = async (payload) => {
+      if (incomingConfig.onInit) {
+        await incomingConfig.onInit(payload)
+      }
+    }
+
+    return config
+  }

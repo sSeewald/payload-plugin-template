@@ -1,6 +1,8 @@
 build
 dist
 /media
+.next
 node_modules
 .DS_Store
-.env
+*.db
+/data

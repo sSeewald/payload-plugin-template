@@ -2,18 +2,45 @@ version: '3'
 
 services:
   payload:
-    image: node:18-alpine
+    image: node:20-alpine
     ports:
       - '3000:3000'
     volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "yarn install && yarn dev"
+      # Workspace configuration
+      - ../pnpm-workspace.yaml:/workspace/pnpm-workspace.yaml:ro
+      - ../.npmrc:/workspace/.npmrc:ro
+      
+      # Dev app source files (read-only)
+      - ./src:/workspace/dev/src:ro
+      - ./package.json:/workspace/dev/package.json:ro
+      - ./tsconfig.json:/workspace/dev/tsconfig.json:ro
+      - ./next.config.mjs:/workspace/dev/next.config.mjs:ro
+      - ./next-env.d.ts:/workspace/dev/next-env.d.ts:ro
+      
+      # Plugin source and dist (read-only) - mount to root of workspace
+      - ../src:/workspace/src:ro
+      - ../dist:/workspace/dist:ro
+      - ../package.json:/workspace/package.json:ro
+      - ../tsconfig.json:/workspace/tsconfig.json:ro
+      
+      # Container-specific volumes for generated content
+      - root_node_modules:/workspace/node_modules
+      - dev_node_modules:/workspace/dev/node_modules
+      - next_cache:/workspace/dev/.next
+      - pnpm_store:/root/.local/share/pnpm/store
+    working_dir: /workspace
+    command: >
+      sh -c "
+        npm install -g pnpm &&
+        pnpm install &&
+        cd dev &&
+        pnpm payload generate:importmap &&
+        pnpm dev
+      "
     depends_on:
       - mongo
     env_file:
-      - .env
+      - .env.docker
 
   mongo:
     image: mongo:latest
@@ -28,4 +55,7 @@ services:
 
 volumes:
   data:
-  node_modules:
+  root_node_modules:
+  dev_node_modules:
+  next_cache:
+  pnpm_store:

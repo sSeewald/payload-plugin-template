@@ -1,44 +1,98 @@
-import { buildConfig } from 'payload/config';
-import path from 'path';
-import Users from './collections/Users';
-import Examples from './collections/Examples';
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { webpackBundler } from '@payloadcms/bundler-webpack'
-import { slateEditor } from '@payloadcms/richtext-slate'
-import { samplePlugin } from '../../src/index'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import path from 'path'
+import { buildConfig } from 'payload'
+import { myPlugin } from 'payload-plugin-template'
+import { fileURLToPath } from 'url'
+
+import { testEmailAdapter } from './emailAdapter'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+
+// Detect if we're running in Docker (MongoDB) or locally (SQLite)
+const databaseURI = process.env.DATABASE_URI || ''
+const isMongoDb = databaseURI.startsWith('mongodb://')
+
+// Choose the appropriate database adapter
+const dbAdapter = isMongoDb
+  ? mongooseAdapter({
+      url: databaseURI,
+    })
+  : sqliteAdapter({
+      client: {
+        url: databaseURI || path.resolve(dirname, '../database.db'),
+      },
+    })
 
 export default buildConfig({
   admin: {
-    user: Users.slug,
-    bundler: webpackBundler(),
-    webpack: config => {
-      const newConfig = {
-        ...config,
-        resolve: {
-          ...config.resolve,
-          alias: {
-            ...(config?.resolve?.alias || {}),
-            react: path.join(__dirname, '../node_modules/react'),
-            'react-dom': path.join(__dirname, '../node_modules/react-dom'),
-            payload: path.join(__dirname, '../node_modules/payload'),
-          },
-        },
-      }
-      return newConfig
+    autoLogin: {
+      email: 'dev@payloadcms.com',
+      password: 'test',
     },
+    user: 'users',
   },
-  editor: slateEditor({}),
   collections: [
-    Examples, Users,
+    {
+      slug: 'users',
+      auth: true,
+      fields: [],
+    },
+    {
+      slug: 'pages',
+      admin: {
+        useAsTitle: 'title',
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+        },
+        {
+          name: 'content',
+          type: 'richText',
+        },
+      ],
+    },
+    {
+      slug: 'media',
+      fields: [
+        {
+          name: 'text',
+          type: 'text',
+        },
+      ],
+      upload: true,
+    },
   ],
+  db: dbAdapter,
+  editor: lexicalEditor(),
+  email: testEmailAdapter,
+  async onInit(payload) {
+    const existingUsers = await payload.find({
+      collection: 'users',
+      limit: 1,
+    })
+
+    if (existingUsers.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: 'dev@payloadcms.com',
+          password: 'test',
+        },
+      })
+    }
+  },
+  plugins: [
+    myPlugin({
+      debug: true,
+    }),
+  ],
+  secret: process.env.PAYLOAD_SECRET || 'SOME_SECRET',
   typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
+    outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  graphQL: {
-    schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
-  },
-  plugins: [samplePlugin({ enabled: true })],
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI,
-  }),
 })

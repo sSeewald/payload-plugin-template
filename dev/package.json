@@ -1,35 +1,38 @@
 {
-  "name": "Payload2Blank",
-  "description": "A blank template to get started with Payload",
+  "name": "payload-plugin-template",
+  "description": "A test app for the plugin based on npx create-payload-app - blank ",
   "version": "1.0.0",
-  "main": "dist/server.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon",
-    "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build",
-    "build:server": "tsc",
-    "build": "yarn copyfiles && yarn build:payload && yarn build:server",
-    "serve": "cross-env PAYLOAD_CONFIG_PATH=dist/payload.config.js NODE_ENV=production node dist/server.js",
-    "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png}\" dist/",
-    "generate:types": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
-    "generate:graphQLSchema": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:graphQLSchema",
-    "payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload"
+    "dev": "cross-env NODE_OPTIONS=\"--no-deprecation\" next dev --turbopack",
+    "devsafe": "rimraf .next && pnpm dev",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation\" next build",
+    "start": "cross-env NODE_OPTIONS=\"--no-deprecation\" next start",
+    "payload": "payload",
+    "docker:up": "docker compose -f docker-compose.yml up",
+    "docker:down": "docker compose -f docker-compose.yml down",
+    "docker:clean": "docker compose -f docker-compose.yml down -v",
+    "generate:types": "payload generate:types",
+    "generate:schema": "payload-graphql generate:schema",
+    "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
-    "@payloadcms/bundler-webpack": "^1.0.0",
-    "@payloadcms/db-mongodb": "^1.0.0",
-    "@payloadcms/plugin-cloud": "^2.0.0",
-    "@payloadcms/richtext-slate": "^1.0.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "payload": "^2.0.0"
+    "@payloadcms/db-mongodb": "^3.52.0",
+    "@payloadcms/db-sqlite": "^3.52.0",
+    "@payloadcms/next": "3.52.0",
+    "@payloadcms/richtext-lexical": "3.52.0",
+    "@payloadcms/ui": "3.52.0",
+    "next": "15.4.6",
+    "payload": "3.52.0",
+    "payload-plugin-template": "workspace:*",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.9",
-    "copyfiles": "^2.4.1",
-    "nodemon": "^2.0.6",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.8.4"
+    "cross-env": "^10.0.0",
+    "dotenv": "^17.2.1",
+    "rimraf": "^6.0.1",
+    "typescript": "5.9.2"
   }
 }
