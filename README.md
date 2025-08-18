@@ -1,4 +1,10 @@
 # Payload v3 Plugin Template
+[![author](https://img.shields.io/badge/author-Sascha%20Seewald-blue)](https://www.linkedin.com/in/sascha-seewald-1a065336/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue.svg)](https://www.typescriptlang.org/)
+[![Payload CMS](https://img.shields.io/badge/Payload%20CMS-3.x-black.svg)](https://payloadcms.com/)
+
+[![CI](https://github.com/sSeewald/payload-plugin-template/actions/workflows/test.yml/badge.svg)](https://github.com/sSeewald/payload-plugin-template/actions/workflows/ci.yml) [![Forked From](https://img.shields.io/badge/forked%20from-payloadcms%2Fpayload--plugin--template-blue?style=flat-square)](https://github.com/payloadcms/payload-plugin-template)
 
 > **This is a fork of the official [Payload Plugin Template](https://github.com/payloadcms/payload-plugin-template)**
 > Special thanks to the amazing team at [Payload CMS](https://payloadcms.com) for creating this excellent foundation for plugin development.
