@@ -99,10 +99,12 @@ cd dev && pnpm docker:clean
 
 ### Testing
 
-The template includes comprehensive test examples:
+The template includes comprehensive test examples with both unit and E2E testing:
+
+#### Unit Tests (Jest)
 
 ```bash
-# Run all tests
+# Run all unit tests
 pnpm test
 
 # Watch mode
@@ -117,6 +119,27 @@ Test files are located in `src/__tests__/` and cover:
 - React components (Server & Client)
 - Custom endpoints
 - Integration scenarios
+
+#### E2E Tests (Playwright)
+
+```bash
+# Run E2E tests (requires dev server running)
+pnpm test:e2e
+
+# Run E2E tests with UI
+pnpm test:e2e:ui
+
+# Run specific test file
+pnpm test:e2e admin-components.spec.ts
+```
+
+E2E test files are located in `e2e/tests/` and cover:
+- Admin dashboard components interaction
+- API endpoint functionality
+- GraphQL queries
+- User interface workflows
+
+**Note:** Playwright is configured to use an existing dev server on port 3000. Make sure to run `pnpm dev` before running E2E tests.
 
 ## Building Your Plugin
 
@@ -193,6 +216,87 @@ export const myEndpoint: Endpoint = {
   }
 }
 ```
+
+## Using @ Aliases for Exports
+
+The plugin template includes an automatic @ alias transformation system that simplifies how you reference your components and utilities in the plugin configuration.
+
+### How It Works
+
+When you use @ aliases in your plugin code (like `@components/MyComponent`), the build process automatically:
+1. Tracks all @ alias usage in your TypeScript files
+2. Resolves them to the correct file paths
+3. Generates an `exports.js` file with all necessary exports
+4. Transforms the @ aliases to proper package imports (`payload-plugin-template/exports#MyComponent`)
+
+### @ Alias Patterns
+
+```typescript
+// In your plugin configuration (src/index.ts or similar)
+config.admin.components = {
+  afterDashboard: [
+    // Named export from a specific path
+    '@components/AfterDashboard#AfterDashboard',
+    
+    // Named export using shorthand (assumes export name matches last path segment)
+    '@components#AfterDashboardClient',
+    
+    // Default export (automatically detected)
+    '@example/exampleComponent',
+    
+    // Nested paths work too
+    '@utils/helpers/formatter#formatDate'
+  ]
+}
+```
+
+### Path Resolution
+
+The @ alias paths map directly to your file structure:
+
+| @ Alias | Resolves To | Export |
+|---------|-------------|---------|
+| `@components/MyComponent` | `dist/components/MyComponent.js` or `dist/components/MyComponent/index.js` | Named or default export `MyComponent` |
+| `@components#MyComponent` | `dist/components/index.js` | Named export `MyComponent` |
+| `@utils/helper#format` | `dist/utils/helper.js` or `dist/utils/helper/index.js` | Named export `format` |
+
+### Default vs Named Exports
+
+The system automatically detects whether your module uses default or named exports:
+
+```typescript
+// Default export (src/example/Component.tsx)
+export default function Component() { ... }
+// Use: '@example/Component'
+
+// Named export (src/components/index.ts)
+export const MyComponent = () => { ... }
+// Use: '@components#MyComponent'
+```
+
+### Build-Time Validation
+
+During the build process, if an @ alias can't be resolved, you'll see a clear error message:
+
+```
+❌ ERROR: Could not resolve @ alias: @components/NonExistent
+   Tried paths:
+     - dist/components/NonExistent.js
+     - dist/components/NonExistent/index.js
+   Check if the file exists or if the @ alias path matches the actual file structure
+```
+
+This helps catch typos and incorrect paths early in the development process.
+
+### Benefits
+
+- **Type Safety**: TypeScript still validates your exports
+- **Automatic Export Generation**: No need to manually maintain export files
+- **Auto-Generated Import Map**: Automatically generates importMap.js on build changes
+- **CSS/SCSS Support**: Full support for CSS and SCSS modules with automatic compilation
+- **Clear Error Messages**: Build-time validation catches issues early
+- **Flexible Patterns**: Support for both named and default exports
+- **Direct Path Mapping**: Intuitive mapping from @ aliases to file structure
 
 ## Publishing
 

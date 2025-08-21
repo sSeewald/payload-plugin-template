@@ -70,6 +70,9 @@ export default buildConfig({
   db: dbAdapter,
   editor: lexicalEditor(),
   email: testEmailAdapter,
+  graphQL: {
+    schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
+  },
   async onInit(payload) {
     const existingUsers = await payload.find({
       collection: 'users',

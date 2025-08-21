@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-template",
-  "version": "3.52.0",
+  "version": "1.0.0",
   "homepage:": "https://payloadcms.com",
   "repository": "git@github.com:payloadcms/payload-plugin-template.git",
   "description": "Payload plugin template using v3",
@@ -14,8 +14,8 @@
     }
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "keywords": [
     "payload",
     "cms",
@@ -26,22 +26,31 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json && pnpm copyfiles",
+    "build": "pnpm clean && rollup -c rollup.config.js && pnpm build:types",
+    "build:types": "tsc --emitDeclarationOnly --declaration --declarationDir dist",
+    "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
     "build:all": "pnpm build && pnpm -C dev build",
     "build:app": "pnpm -C dev build",
     "clean": "rimraf {dist,*.tsbuildinfo,package}",
-    "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png}\" dist/",
-    "dev": "concurrently -k -p \"[{name}]\" -n \"PLUGIN,APP\" -c \"cyan.bold,green.bold\" \"pnpm watch\" \"pnpm -C dev dev\"",
-    "dev:docker": "concurrently -k -p \"[{name}]\" -n \"PLUGIN,DOCKER\" -c \"cyan.bold,magenta.bold\" \"pnpm watch\" \"pnpm -C dev docker:up\"",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"ROL,APP,EXPORTS\" -c \"cyan.bold,green.bold,magenta.bold\" \"pnpm watch\" \"sleep 2 && pnpm -C dev dev\" \"pnpm watch:exports\"",
+    "dev:docker": "concurrently -k -p \"[{name}]\" -n \"ROL,DOCKER,EXPORTS\" -c \"cyan.bold,magenta.bold,green.bold\" \"pnpm watch\" \"sleep 2 && pnpm -C dev docker:up\" \"pnpm watch:exports\"",
+    "generate:importmap": "pnpm -C dev generate:importmap",
+    "generate:types": "pnpm -C dev generate:types",
+    "generate:schema": "pnpm -C dev generate:schema",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:codegen": "playwright codegen",
     "prepack": "pnpm prepublishOnly",
-    "prepublishOnly": "pnpm clean && pnpm build && pnpm copyfiles",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TSC,ASSETS\" -c \"yellow.bold,blue.bold\" \"tsc --watch --project tsconfig.json\" \"pnpm watch:assets\"",
-    "watch:assets": "nodemon --watch src --ext html,css,scss,ttf,woff,woff2,eot,svg,jpg,png --exec \"pnpm copyfiles\""
+    "prepublishOnly": "pnpm build",
+    "watch": "pnpm clean && concurrently -k -p \"[{name}]\" -n \"BUILD,TYPES\" -c \"cyan.bold,blue.bold\" \"rollup -c rollup.config.js --watch\" \"pnpm watch:types\"",
+    "watch:exports": "sleep 5 && chokidar \"dist/exports.js\" -c \"pnpm generate:importmap || true\"",
+    "watch:types": "tsc --emitDeclarationOnly --declaration --declarationDir dist --watch --preserveWatchOutput"
   },
   "peerDependencies": {
     "@payloadcms/ui": ">=3.0.0 <4.0.0",
@@ -50,10 +59,14 @@
     "react": ">=19.0.0 <20.0.0",
     "react-dom": ">=19.0.0 <20.0.0"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@payloadcms/eslint-config": "3.28.0",
     "@eslint/js": "^9.33.0",
+    "@payloadcms/eslint-config": "3.28.0",
+    "@playwright/test": "^1.55.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-swc": "^0.4.0",
+    "@swc/core": "^1.13.3",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^30.0.0",
@@ -62,19 +75,24 @@
     "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
+    "chokidar-cli": "^3.0.0",
     "concurrently": "^9.2.0",
-    "copyfiles": "^2.4.1",
     "cross-env": "^10.0.0",
     "dotenv": "^17.2.1",
     "eslint": "^9.33.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "glob": "^11.0.3",
     "globals": "^16.3.0",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "nodemon": "^3.1.10",
+    "playwright": "^1.55.0",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
+    "rollup": "^4.46.4",
+    "rollup-plugin-preserve-directives": "^0.4.0",
+    "sass": "^1.90.0",
     "ts-jest": "^29.4.1",
     "typescript": "5.9.2"
   },
@@ -88,26 +106,30 @@
     "exports": {
       ".": {
         "import": "./dist/index.js",
+        "require": "./dist/index.js",
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
-      "./components": {
-        "import": "./dist/components/index.js",
-        "default": "./dist/components/index.js",
-        "types": "./dist/components/index.d.ts"
+      "./exports": {
+        "import": "./dist/exports.js",
+        "require": "./dist/exports.js",
+        "types": "./dist/exports.d.ts",
+        "default": "./dist/exports.js"
       }
     }
   },
   "exports": {
     ".": {
       "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./components": {
-      "import": "./dist/components/index.js",
-      "default": "./dist/components/index.js",
-      "types": "./dist/components/index.d.ts"
+    "./exports": {
+      "import": "./dist/exports.js",
+      "require": "./dist/exports.js",
+      "types": "./dist/exports.d.ts",
+      "default": "./dist/exports.js"
     }
   }
 }

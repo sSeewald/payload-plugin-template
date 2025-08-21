@@ -1,0 +1,207 @@
+.afterDashboard {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--border-radius-s);
+  padding: calc(var(--base) * 1.5);
+  margin: var(--base) 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--base);
+  margin-bottom: calc(var(--base) * 1.5);
+  padding-bottom: var(--base);
+  border-bottom: 1px solid var(--theme-elevation-100);
+
+  h4 {
+    margin: 0;
+    color: var(--theme-text);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+}
+
+.badge {
+  background: var(--theme-success-50);
+  color: var(--theme-success-500);
+  padding: calc(var(--base) / 4) calc(var(--base) / 2);
+  border-radius: var(--border-radius-s);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.content {
+  color: var(--theme-text);
+}
+
+.description {
+  margin: 0 0 calc(var(--base) * 1.5) 0;
+  color: var(--theme-text);
+  line-height: 1.6;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: calc(var(--base) / 2);
+  margin-bottom: calc(var(--base) * 1.5);
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 2);
+  padding: calc(var(--base) / 2);
+  background: var(--theme-elevation-50);
+  border-radius: var(--border-radius-s);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+}
+
+.featureDisabled {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 2);
+  padding: calc(var(--base) / 2);
+  background: var(--theme-elevation-50);
+  border-radius: var(--border-radius-s);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+  opacity: 0.6;
+}
+
+.featureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--theme-success-500);
+  font-weight: bold;
+}
+
+.featureIconDisabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--theme-text-light);
+  font-weight: bold;
+}
+
+.demo {
+  margin-bottom: calc(var(--base) * 1.5);
+
+  h5 {
+    margin: 0 0 calc(var(--base) / 2) 0;
+    color: var(--theme-text-light);
+    font-size: 0.813rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+}
+
+.userInfo {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--border-radius-s);
+  padding: 0;
+  overflow: hidden;
+}
+
+.userHeader {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 2);
+  padding: calc(var(--base) * 0.75) var(--base);
+  background: var(--theme-elevation-50);
+  border-bottom: 1px solid var(--theme-elevation-100);
+}
+
+.userIcon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-elevation-100);
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+
+.userTitle {
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: var(--theme-text);
+}
+
+.userDetails {
+  padding: var(--base);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) * 0.75);
+
+  dt {
+    display: none;
+  }
+
+  dd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    color: var(--theme-text);
+    font-size: 0.813rem;
+
+    &:before {
+      content: attr(data-label);
+      color: var(--theme-text-light);
+      font-weight: 400;
+    }
+  }
+}
+
+.mono {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--theme-text-light);
+}
+
+.note {
+  padding: calc(var(--base) * 0.75) var(--base);
+  background: var(--theme-elevation-50);
+  color: var(--theme-text-light);
+  border-top: 1px solid var(--theme-elevation-100);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.noUser {
+  padding: calc(var(--base) * 2);
+  text-align: center;
+  color: var(--theme-text-light);
+  font-size: 0.813rem;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--border-radius-s);
+}
+
+.info {
+  padding: var(--base);
+  background: var(--theme-elevation-50);
+  border-radius: var(--border-radius-s);
+  color: var(--theme-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  strong {
+    color: var(--theme-text);
+    font-weight: 600;
+  }
+}

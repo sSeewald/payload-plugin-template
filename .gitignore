@@ -62,6 +62,10 @@ lib-cov
 coverage
 *.lcov
 
+# Playwright test results
+test-results
+playwright-report
+
 # nyc test coverage
 .nyc_output
 
@@ -368,3 +372,13 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,windows,webstorm,sublimetext,visualstudiocode
+
+# Development databases
+dev/database.db
+dev/database.db-journal
+dev/docker/data
+
+# Next.js dev folder
+dev/.next/
+dev/out/
+dev/build

@@ -50,7 +50,7 @@ export default [
         ecmaVersion: 'latest',
         projectService: {
           maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 40,
-          allowDefaultProject: ['scripts/*.ts', '*.js', '*.mjs', '*.spec.ts', '*.d.ts', 'dev/*.mjs'],
+          allowDefaultProject: ['scripts/*.ts', 'scripts/*.js', '*.js', '*.mjs', '*.spec.ts', '*.d.ts', 'dev/*.mjs'],
         },
         // projectService: true,
         tsconfigRootDir: import.meta.dirname,

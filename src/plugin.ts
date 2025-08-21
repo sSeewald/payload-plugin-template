@@ -18,8 +18,8 @@ export const myPlugin =
         ...(config.admin?.components || {}),
         // Add additional admin components here
         afterDashboard: [
-          'payload-plugin-template/components#AfterDashboard',
-          'payload-plugin-template/components#AfterDashboardClient',
+          '@components#AfterDashboard',
+          '@components#AfterDashboardClient',
         ],
       },
     }

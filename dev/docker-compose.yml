@@ -9,20 +9,20 @@ services:
       # Workspace configuration
       - ../pnpm-workspace.yaml:/workspace/pnpm-workspace.yaml:ro
       - ../.npmrc:/workspace/.npmrc:ro
-      
-      # Dev app source files (read-only)
-      - ./src:/workspace/dev/src:ro
+
+      # Dev app source files
+      - ./src:/workspace/dev/src
       - ./package.json:/workspace/dev/package.json:ro
       - ./tsconfig.json:/workspace/dev/tsconfig.json:ro
       - ./next.config.mjs:/workspace/dev/next.config.mjs:ro
       - ./next-env.d.ts:/workspace/dev/next-env.d.ts:ro
-      
+
       # Plugin source and dist (read-only) - mount to root of workspace
       - ../src:/workspace/src:ro
       - ../dist:/workspace/dist:ro
       - ../package.json:/workspace/package.json:ro
       - ../tsconfig.json:/workspace/tsconfig.json:ro
-      
+
       # Container-specific volumes for generated content
       - root_node_modules:/workspace/node_modules
       - dev_node_modules:/workspace/dev/node_modules
@@ -34,7 +34,6 @@ services:
         npm install -g pnpm &&
         pnpm install &&
         cd dev &&
-        pnpm payload generate:importmap &&
         pnpm dev
       "
     depends_on:
