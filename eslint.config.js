@@ -23,6 +23,7 @@ export const defaultESLintIgnores = [
   '**/node_modules/',
   '**/temp/',
   '**/coverage/',
+  '**/playwright-report/',
   '**/*.test.ts',
   '**/*.test.tsx',
   '**/*.spec.ts',
