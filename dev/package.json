@@ -1,5 +1,5 @@
 {
-  "name": "payload-plugin-template",
+  "name": "payload-plugin-template-dev",
   "description": "A test app for the plugin based on npx create-payload-app - blank ",
   "version": "1.0.0",
   "license": "MIT",
